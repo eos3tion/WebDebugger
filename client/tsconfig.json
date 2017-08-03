@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "outFile": "dist/webdebugger.js",
+        "lib": [
+            "es5",
+            "dom"
+        ],
+        "rootDir": "./src"
+    }
+}
