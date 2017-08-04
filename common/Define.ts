@@ -30,12 +30,12 @@ const enum CmdType {
  * @interface Cmd
  */
 interface Cmd {
-   /**
-    * 指令序列
-    * 
-    * @type {number}
-    * @memberof Cmd
-    */
+    /**
+     * 指令序列
+     * 
+     * @type {number}
+     * @memberof Cmd
+     */
     id: number;
     /**
      * 指令类型
@@ -48,6 +48,23 @@ interface Cmd {
     data?: any;
 }
 
+interface ConnectCmdData {
+    /**
+     * 
+     * 连接服务器的引用页面
+     * @type {string}
+     * @memberof ConnectCmdData
+     */
+    referer: string;
+
+    /**
+     * userAgent信息
+     * 
+     * @type {string}
+     * @memberof ConnectCmdData
+     */
+    ua: string;
+}
 
 interface ExecuteCmd extends Cmd {
     data: string;

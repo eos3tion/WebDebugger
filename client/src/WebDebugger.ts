@@ -12,12 +12,25 @@ interface WebSocket {
 }
 module WebDebugger {
 
-
     const enum Constant {
+
+        /**
+         * 默认的重连延迟时间
+         */
+        DefaultReconnectDelay = 5 * 60 * 1000,
+    }
+
+    const enum StringConstant {
         /**
          * DebugServer的key
          */
-        DebuggerServerKey = "data-wdserver"
+        DebuggerServerKey = "data-wdserver",
+
+        /**
+         * DebugServer的重连时间
+         */
+        ReconnectDelay = "data-wddelay",
+
     }
     WebSocket.prototype.sendCmd = function (this: WebSocket, type: CmdType, data, id?: number) {
         this.send(JSON.stringify({ type, data, id }))
@@ -25,7 +38,20 @@ module WebDebugger {
 
     let ws: WebSocket;
 
+    /**
+     * 服务器路径
+     */
     let serverUrl: string;
+
+    /**
+     * 重连的延迟
+     */
+    let reconnectDelay: number;
+
+    /**
+     * 重连的计时器标识
+     */
+    let tReconnect: number;
 
     let serverHandlers: { [index: number]: { (cmd: Cmd, ws: WebSocket): void } } =
         { [CmdType.Execute]: execute };
@@ -57,7 +83,10 @@ module WebDebugger {
                     }
                     let toCValue = typeof currentValue;
                     entity.type = getObjectType(currentValue);
-                    if (currentValue == null && toCValue !== "object") {//如果是Object，不显示值
+                    if (currentValue == null || toCValue !== "object") {//如果是Object，不显示值
+                        if (toCValue === "function") {
+                            currentValue = currentValue.toString();
+                        }
                         entity.value = currentValue;
                     }
                     entities.push(entity);
@@ -105,11 +134,12 @@ module WebDebugger {
 
 
     export function init() {
-        let script = document.querySelector(`script[${Constant.DebuggerServerKey}]`);
-        serverUrl = script && script.getAttribute(Constant.DebuggerServerKey);
+        let script = document.querySelector(`script[${StringConstant.DebuggerServerKey}]`);
+        serverUrl = script && script.getAttribute(StringConstant.DebuggerServerKey);
         if (!serverUrl) {
             return
         }
+        reconnectDelay = +script.getAttribute(StringConstant.ReconnectDelay) || Constant.DefaultReconnectDelay;
         //检查地址
         let res = /^(ws(s)?:)\/\//.exec(serverUrl);
         let cProtocal = location.protocol;
@@ -120,8 +150,19 @@ module WebDebugger {
                 return
             }
         } else {
-            serverUrl = (cProtocal == "https:" ? "wss" : "ws") + "//" + serverUrl;
+            serverUrl = (cProtocal == "https:" ? "wss" : "ws") + "://" + serverUrl;
         }
+    }
+
+    function checkReconnect() {
+        if (!ws) {
+            connect();
+        }
+    }
+
+    function tryReconnect() {
+        clearTimeout(tReconnect);
+        tReconnect = setTimeout(checkReconnect, reconnectDelay);
     }
 
     /**
@@ -134,10 +175,23 @@ module WebDebugger {
         try {
             ws = new WebSocket(serverUrl);
         } catch (e) {
+            tryReconnect();
             return console.error(e);
         }
         ws.onopen = onOpen;
         ws.onmessage = onMessage;
+        ws.onclose = onClose;
+    }
+
+    function onClose(this: WebSocket, e: CloseEvent) {
+        this.onopen = undefined;
+        this.onmessage = undefined;
+        this.onclose = undefined;
+        if (this == ws) {
+            ws = undefined;
+        }
+        //隔interval时间尝试重新连接一次
+        tryReconnect();
     }
 
     function onMessage(this: WebSocket, e: MessageEvent) {
@@ -169,4 +223,6 @@ module WebDebugger {
         this.sendCmd(CmdType.Connect, { referer: location.href, ua: navigator.userAgent });
     }
 
+    init();
+    connect();
 }

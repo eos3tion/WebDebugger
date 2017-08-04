@@ -1,0 +1,26 @@
+{
+  "name": "wdserver",
+  "version": "1.0.0",
+  "description": "用于调试那些无法连接浏览器调试器的html5页面",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eos3tion/WebDebugger.git"
+  },
+  "keywords": [
+    "html5",
+    "debugger"
+  ],
+  "author": "3tion",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/eos3tion/WebDebugger/issues"
+  },
+  "homepage": "https://github.com/eos3tion/WebDebugger#readme",
+  "dependencies": {
+    "ws": "^3.1.0"
+  }
+}

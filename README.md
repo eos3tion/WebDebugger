@@ -6,7 +6,7 @@
 ## 目前想到的方案  
 1. 建立一个客户端脚本，需要调试页面的时候，加上如下脚本：
 ```html
-<script data-wdserver="192.168.0.168:8888" src="webdebugger.js"></script>
+<script async="async" data-wdserver="192.168.0.168:8888" src="webdebugger.js"></script>
 ```
 2. 脚本启动时，检查是否可以使用`websocket`连接`data-wdserver`的服务器  
 3. 连接成功后，提交 `referer` `user-agent`等信息
