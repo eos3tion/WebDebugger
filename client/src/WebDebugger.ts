@@ -134,8 +134,9 @@ module WebDebugger {
 
 
     export function init() {
-        let script = document.querySelector(`script[${StringConstant.DebuggerServerKey}]`);
-        serverUrl = script && script.getAttribute(StringConstant.DebuggerServerKey);
+        let attr = StringConstant.DebuggerServerKey;
+        let script = document.querySelector(`script[${attr}]`);
+        serverUrl = script && script.getAttribute(attr);
         if (!serverUrl) {
             return
         }
