@@ -46,7 +46,7 @@ module WebDebugger {
     /**
      * 重连的延迟
      */
-    let reconnectDelay: number;
+    let reconnectDelay: number = Constant.DefaultReconnectDelay;
 
     /**
      * 重连的计时器标识
