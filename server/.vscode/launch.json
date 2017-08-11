@@ -8,7 +8,12 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceRoot}/dist/server/src/WebDebuggerServer"
+            "program": "${workspaceRoot}/dist/server/src/WebDebuggerServer",
+            "cwd": "${workspaceRoot}",
+            "args": [
+                "1212",
+                "1"
+            ]
         }
     ]
 }

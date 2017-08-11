@@ -1,8 +1,15 @@
 {
     "compilerOptions": {
         "target": "esnext",
+        "removeComments": true,
         "module": "commonjs",
-        "outDir": "dist"
+        "alwaysStrict": true,
+        "pretty": true,
+        "outDir": "./dist",
+        "rootDirs": [
+            "./src",
+            "../common"
+        ]
     },
     "exclude": [
         "mode_modules"

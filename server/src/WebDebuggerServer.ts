@@ -2,6 +2,8 @@
 
 import * as WebSocket from "ws";
 import * as repl from "repl";
+import * as https from "https";
+import * as fs from "fs";
 
 
 interface ConnectInfo extends ConnectCmdData {
@@ -20,6 +22,10 @@ const enum Constant {
     Key_ConnectInfo = "connectInfo",
 
     Key_ClientID = "clientId",
+
+    DefaulSSLCrt = "./ssl/test.crt",
+
+    DefaultSSLKey = "./ssl/test.key",
 
 }
 
@@ -106,6 +112,7 @@ WebSocket.prototype.toString = function () {
     let info = this[Constant.Key_ConnectInfo] as ConnectInfo;
     return `id:${this[Constant.Key_ClientID]}\t${info ? `info:{ ip:${info.ip}\t referer:${info.referer}` : ""}`;
 }
+
 
 /**
  * 尝试发送指令到客户端
@@ -206,9 +213,26 @@ function formatString(val) {
     return val;
 }
 
-function start(port: number = Constant.DebugPort) {
-    wss = new WebSocket.Server({ port });
-    console.log(`服务器开始监听[${port}]端口`)
+function start(port: number = Constant.DebugPort, ssl?: boolean, cer?: string, key?: string) {
+    let opt = {} as WebSocket.IServerOptions;
+    if (ssl) {
+        cer = cer || Constant.DefaulSSLCrt;
+        key = key || Constant.DefaultSSLKey;
+        if (!fs.existsSync(cer) || !fs.existsSync(key)) {
+            console.error(`ssl秘钥路径配置有误`)
+            return process.exit(1);
+        }
+        let server = https.createServer({
+            cert: fs.readFileSync(cer),
+            key: fs.readFileSync(key)
+        });
+        opt.server = server;
+        server.listen(port);
+    } else {
+        opt.port = port;
+    }
+    wss = new WebSocket.Server(opt);
+    console.log(`服务器${ssl ? "使用SSL" : ""}开始监听[${port}]端口`)
     replServer = repl.start({
         prompt: `${Constant.ProjectName}>`,
         eval: onEnter,
@@ -341,5 +365,10 @@ function start(port: number = Constant.DebugPort) {
     });
 }
 
+let argv = process.argv;
 let port = +process.argv[2] || undefined;
-start(port);
+let useSSL = !!argv[3];
+let cer = argv[4];
+let key = argv[5];
+
+start(port, useSSL, cer, key);
