@@ -100,6 +100,14 @@ interface ExecuteCmdRPC extends ExecuteCmd {
      */
     raw?: string;
 
+    /**
+     * 是否添加了window前缀进行执行
+     * 
+     * @type {boolean}
+     * @memberof ExecuteCmdRPC
+     */
+    addWindow?: boolean;
+
     callback: { (param1: null, param2: [string[], string]) }
 }
 
@@ -153,10 +161,11 @@ function onTab(expression: string, callback) {
     } else {
         let subs = expression.split(".");
         let len = subs.length;
-        let execute = len > 1 ? subs[len - 2] : "window";
-        console.log(expression, "===================", execute)
+        let addWindow = len == 1;
+        let execute = addWindow ? "window" : subs.slice(0, len - 1).join(".");
         let cmd = sendToClient(execute, CallerType.OnTab, expression);
         if (cmd) {
+            cmd.addWindow = addWindow;
             cmd.callback = callback;
         } else {
             callback(null, [[], expression]);
@@ -305,8 +314,8 @@ function start(port: number = Constant.DebugPort, ssl?: boolean, cer?: string, k
                                         if (define) {
                                             const { type, data } = define;
                                             if (typeof data == "object") {
-                                                let start = sendedCmd.data + ".";
-                                                let raw = sendedCmd.raw;
+                                                let { raw, addWindow } = sendedCmd;
+                                                let start = addWindow ? "" : sendedCmd.data + ".";
                                                 const keys = data.map(entity => start + entity.key);
                                                 const hints = keys.filter(key => key.startsWith(raw));
                                                 let result = hints && hints.length ? hints : keys;
