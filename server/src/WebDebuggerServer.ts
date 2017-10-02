@@ -375,7 +375,7 @@ function start(port: number = Constant.DebugPort, ssl?: boolean, cer?: string, k
 }
 
 let argv = process.argv;
-let port = +process.argv[2] || undefined;
+let port = +argv[2] || undefined;
 let useSSL = !!argv[3];
 let cer = argv[4];
 let key = argv[5];
