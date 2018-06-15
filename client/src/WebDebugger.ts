@@ -56,8 +56,44 @@ module WebDebugger {
     let serverHandlers: { [index: number]: { (cmd: Cmd, ws: WebSocket): void } } =
         { [CmdType.Execute]: execute };
 
+    const getData = function () {
+        let test: number;
+        try {
+            test = eval("1+1")
+        } catch{ }
+        //检测当前环境是否支持 eval 某些环境把 eval屏蔽了
+        return test == 2 ? eval : function getData(expression: string) {
+            expression = expression.trim();
+            let subs = expression.split(".");
+            let result: any = window;
+            let len = subs.length;
+            for (let i = 0; i < len; i++) {
+                let sub = subs[i];
+                let res = /([a-zA-Z_$][0-9a-zA-Z_$]+)\(([^)]*)\)/.exec(sub);
+                let c = sub;
+                if (res) {//字符串为方法
+                    let handler = result[res[1]] as Function;
+                    let params = res[2];
+                    let datas: any[];
+                    if (params) {
+                        datas = params.split(",");
+                        for (var j = 0; j < params.length; j++) {
+                            datas[j] = getData(params[j]);
+                        }
+                    } else {
+                        datas = undefined;
+                    }
+                    result = handler.apply(result, datas);
+                } else {
+                    result = result[c];
+                }
+            }
+            return result;
+        }
+    }()
+
     function execute(cmd: ExecuteCmd, ws: WebSocket) {
-        let result = eval(cmd.data);
+        let result = getData(cmd.data);
         //尝试解析结果
         let define = {} as ObjectDefine;
         //得到第一层的数据
@@ -100,7 +136,6 @@ module WebDebugger {
 
         define.type = type;
         ws.sendCmd(CmdType.ExecuteResult, define, cmd.id);
-
     }
 
     function getObjectType(result, type?: string) {
