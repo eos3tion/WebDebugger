@@ -1,4 +1,4 @@
-const enum CmdType {
+declare const enum CmdType {
     /**
      * 服务端指令的掩码
      */
@@ -170,7 +170,7 @@ interface ObjectKeyValueEntity {
  * 
  * @enum {number}
  */
-const enum DescriptorModifier {
+declare const enum DescriptorModifier {
     Writable = 0b1,
 
     WritableShift = 0,
@@ -183,7 +183,7 @@ const enum DescriptorModifier {
 }
 
 
-const enum ObjectType {
+declare const enum ObjectType {
     Number = "number",
     String = "string",
     Boolean = "boolean",

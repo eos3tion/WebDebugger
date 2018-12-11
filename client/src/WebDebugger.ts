@@ -1,4 +1,4 @@
-/// <reference path="../../common/Define.ts" />
+/// <reference path="../../common/Define.d.ts" />
 interface WebSocket {
     /**
      * 发送指令

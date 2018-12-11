@@ -1,4 +1,4 @@
-/// <reference path="../../common/Define.ts" />
+/// <reference path="../../common/Define.d.ts" />
 
 import * as WebSocket from "ws";
 import * as repl from "repl";
