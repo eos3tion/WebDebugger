@@ -152,8 +152,12 @@ module WebDebugger {
                         if (name) {
                             type = name;
                         } else {
-                            type = fun.toString();// function XXXX(){..............}
-                            type = type.substring(9/* `function `.length */, type.indexOf("("));
+                            type = fun.toString();
+                            if (type[0] == "c") {//class XXXX{........}
+                                type = type.substring(6/* `class `.length */, type.indexOf("{"));
+                            } else {// function XXXX(){..............}
+                                type = type.substring(9/* `function `.length */, type.indexOf("("));
+                            }
                         }
                     } else {
                         type = fun.toString();
