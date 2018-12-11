@@ -105,7 +105,7 @@ module WebDebugger {
                 define.data = entities;
                 //获取其自身的属性和方法
                 Object.getOwnPropertyNames(result).forEach(key => {
-                    let { value, set, get, enumerable, writable, configurable } = Object.getOwnPropertyDescriptor(result, key);
+                    let { set, get, enumerable, writable, configurable } = Object.getOwnPropertyDescriptor(result, key);
                     let entity = { key } as ObjectKeyValueEntity;
                     let modifers = (+enumerable << DescriptorModifier.EnumerableShift)
                         | (+writable << DescriptorModifier.WritableShift)
@@ -118,6 +118,7 @@ module WebDebugger {
                         entity.setter = set.toString();
                     }
                     let toCValue = typeof currentValue;
+                    entity.modifiers = modifers;
                     entity.type = getObjectType(currentValue);
                     if (currentValue == null || toCValue !== "object") {//如果是Object，不显示值
                         if (toCValue === "function") {
