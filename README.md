@@ -8,6 +8,10 @@
 ```html
 <script async="async" data-wdserver="192.168.0.168:8888" src="webdebugger.js"></script>
 ```
+可配置的参数：    
+`data-wddelay`:调试器重连的延迟时间  
+`data-wdserver`:要连接的远程服务器地址  
+
 2. 脚本启动时，检查是否可以使用`websocket`连接`data-wdserver`的服务器  
 3. 连接成功后，提交 `referer` `user-agent`等信息
 4. 服务端可以发送指令到客户端
