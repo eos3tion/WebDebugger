@@ -21,6 +21,6 @@
   },
   "homepage": "https://github.com/eos3tion/WebDebugger#readme",
   "dependencies": {
-    "ws": "^3.1.0"
+    "ws": "^3.3.1"
   }
 }
